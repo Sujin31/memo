@@ -148,16 +148,19 @@ public class BoardController {
                 print.close();
             } else {
                 //디렉토리 설정 및 업로드
-                File rootFile = new File(".");
-                String rootPath = String.valueOf(rootFile.getAbsoluteFile());
-                System.out.println("rootPath = " + rootPath);
 
                 //파일경로
-                String filePath = rootPath + "/src/main/resources/static/se2/upload";
+                String filePath = "";
+                String property = System.getProperty("os.name");
+                if (property.contains("Win")){
+                    //윈도우
+                    filePath = "C:/Users/Sujin/Desktop/test";
+                }else{
+                    //리눅스
+                    filePath = "/home/study/img";
+                }
+
                 File file = new File(filePath);
-                boolean mkdirs = file.mkdirs();
-                System.out.println("file = " + file.getAbsolutePath());
-                System.out.println("mkdirs = " + mkdirs);
 
                 if(!file.exists()) {
                     file.mkdirs();
@@ -175,10 +178,7 @@ public class BoardController {
                 int numRead;
                 byte bytes[] = new byte[Integer.parseInt(request.getHeader("file-size"))];
 
-                System.out.println("outputStream = " + outputStream);
-
                 while((numRead = inputStream.read(bytes,0,bytes.length)) != -1){
-                    System.out.println("numRead = " + numRead);
                     outputStream.write(bytes,0,numRead);
                 }
                 if(inputStream != null) {
@@ -192,7 +192,7 @@ public class BoardController {
                 sFileInfo += "&bNewLine=true";
                 // img 태그의 title 속성을 원본파일명으로 적용시켜주기 위함
                 sFileInfo += "&sFileName="+ sFilename;
-                sFileInfo += "&sFileURL="+"/se2/upload/"+sRealFileNm;
+                sFileInfo += "&sFileURL="+"/img/"+sRealFileNm;
 
                 
 

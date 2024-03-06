@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>상세보기</title>
+    <link rel="stylesheet" href="/css/board.css"> <!--스프링부트는 static이 기본경로-->
+</head>
+<script>
+    function delboard(){
+        document.getElementById('delform').submit();
+    }
+</script>
+<body>
+    <section class="notice">
+        <div id="board-search">
+            <div class="container">
+                <table class="board-table">
+                    <colgroup>
+                        <col style="width:20%">
+                        <col style="*">
+                    </colgroup>
+                    <tr>
+                        <td>카테고리</td>
+                        <td> [ [[${board.category_name}]]  ]</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="title-font">[[${board.title}]]</td>
+                    </tr>
+                    <tr>
+                        <td class="content-size" th:utext="${board.content}" colspan="2" >내용</td>
+                    </tr>
+                    <tr>
+                        <!--<td th:text="${board.tags}" colspan="2">태그</td>-->
+                        <td colspan="2">
+                            <span class="tag" th:each="tag : ${tagList}">[[${tag}]]</span>
+                        </td>
+                    </tr>
+                </table>
+                <div class="center">
+                    <button type="button" class="btn btn-dark" th:onclick="|location.href='@{edit(idx=${board.idx})}'|">수정</button>
+                    <button type="button" class="btn btn-dark" onclick="location.href='/'">목록</button>
+                    <button type="button" class="btn btn-dark" onclick="javascript:delboard();">삭제</button>
+                </div>
+                <form action="/del" method="post" name="delform" id="delform">
+                    <input type="hidden" name="idx" th:value="${board.idx}">
+                </form>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

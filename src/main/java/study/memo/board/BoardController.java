@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -19,6 +21,22 @@ public class BoardController {
 
     @Autowired
     BoardService boardService;
+    private final String myIp = "27.35.204.34";
+    private final String myIp2 = "0:0:0:0:0:0:0:1";
+
+    private boolean checkMyIp(){
+        boolean result = false;
+        String ip = null;
+        HttpServletRequest request =
+                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+
+        ip = request.getRemoteAddr();
+
+        if(myIp.equals(ip) || myIp2.equals(ip)){
+            result = true;
+        }
+        return result;
+    }
 
 
     @GetMapping("")
@@ -64,6 +82,11 @@ public class BoardController {
 
     @GetMapping("write")
     public String boardWrite(Model model){
+        if (!checkMyIp()){
+            model.addAttribute("msg","작성권한이 없습니다.");
+            model.addAttribute("url","/");
+            return "common/alert";
+        }
         List<Category> categories = boardService.getAllCategory();
         model.addAttribute("category",categories);
         return "board/write";
@@ -89,6 +112,13 @@ public class BoardController {
 
     @GetMapping("edit")
     public String BoardEdit(@RequestParam("idx") int idx, Model model){
+
+        if (!checkMyIp()){
+            model.addAttribute("msg","작성권한이 없습니다.");
+            model.addAttribute("url","/view?idx="+idx);
+            return "common/alert";
+        }
+
         List<Category> categories = boardService.getAllCategory();
         Board board = boardService.viewBoard(idx);
         String[] tags = new String[0];
@@ -109,7 +139,14 @@ public class BoardController {
     }
 
     @PostMapping("del")
-    public String deleteBoard(BoardForm form){
+    public String deleteBoard(BoardForm form, Model model){
+
+        if (!checkMyIp()){
+            model.addAttribute("msg","작성권한이 없습니다.");
+            model.addAttribute("url","/view?idx="+form.getIdx());
+            return "common/alert";
+        }
+
         boardService.deleteBoard(form);
         return "redirect:/";
     }

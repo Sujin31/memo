@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>글쓰기</title>
+    <link rel="stylesheet" href="/css/board.css">
+    <script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <script type="text/javascript" src="/se2/js/HuskyEZCreator.js" charset="utf-8"></script>
+    <script>
+        var oEditors = [];
+
+        $(function(){
+            nhn.husky.EZCreator.createInIFrame({
+             oAppRef: oEditors,
+             elPlaceHolder: "ir1",
+             sSkinURI: "../se2/SmartEditor2Skin.html",
+             fCreator: "createSEditor2"
+            });
+        });
+
+        function save(){
+            oEditors.getById["ir1"].exec("UPDATE_CONTENTS_FIELD", []);
+            var form = document.getElementById('writeform');
+            if(validateForm(form)){
+                form.submit();
+            }
+        }
+
+        function validateForm(form){
+            if(!form.title.value){
+                alert("제목을 입력해주세요.");
+                form.title.focus();
+                return false;
+            }
+            if(!form.content.value){
+                alert("내용을 입력해주세요.");
+                form.content.focus();
+                return false;
+            }
+            return true;
+        }
+
+        function enterKey(e){
+
+            if(e.code == 'Enter'){
+                var tag = $('#inputTag').val();
+                $('.tagInput').append("<input type='hidden' name='tag' value='"+tag+"' >");
+                $('.tags').append("<span class='tag'>"+tag+"<button type='button' class='tagbutton' onclick='delTag(this)'>x</button> </span>");
+                $('#inputTag').val('');
+            }
+        }
+
+        function delTag(o){
+            var i = $(o).parent().index();
+            $('.tagInput input').eq(i).remove();
+            $('.tag').eq(i).remove();
+        }
+
+    </script>
+</head>
+<body>
+<section class="notice">
+    <div class="page-title">
+        <div class="container">
+            <h3>게시판 - 글작성</h3>
+        </div>
+    </div>
+    <div id="board-list">
+        <div class="container">
+            <form action="/write" method="post" id="writeform" onsubmit="return validateForm(this);">
+                <table class="board-table">
+                    <colgroup>
+                        <col style="width:120px">
+                        <col style="width:120px">
+                        <col style="width:120px">
+                        <col style="width:*">
+                    </colgroup>
+
+                    <tbody>
+                        <tr>
+                            <td>카테고리</td>
+                            <td>
+                                <select name="category">
+                                    <option th:each="row : ${category}" th:value="${row.idx}" th:text="${row.category}">카테고리</option>
+                                </select>
+                            </td>
+                            <td>제목</td>
+                            <td><input type="text" class="input_text" name="title"></td>
+                        </tr>
+                        <tr>
+                            <td>내용</td>
+                            <td colspan="3">
+                                <textarea name="content" id="ir1" rows="40" cols="130"></textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>태그</td>
+                            <td colspan="3">
+                                <div class="tagInput"></div>
+                                <div class="tags"></div>
+                                <input type="text" class="input_text" name="tag" id="inputTag" onKeyPress="enterKey(event);">
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </form>
+            <div class="right">
+                <button type="button" class="btn btn-dark" onclick="save();">작성</button>
+                <button type="button" class="btn btn-dark" onclick="location.href='/'">취소</button>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>
